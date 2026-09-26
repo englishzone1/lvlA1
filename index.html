@@ -549,6 +549,7 @@ document.getElementById('submitBtn').addEventListener('click', () => {
   let score = 0;
   let maxScore = 0;
   let allAnswered = true;
+  const details = []; // { label, studentAnswer, correctAnswer, result }
 
   // Section A
   answerKey.forEach((correctIdx, qIndex) => {
@@ -558,13 +559,25 @@ document.getElementById('submitBtn').addEventListener('click', () => {
     const options = card.querySelectorAll('.option');
     options.forEach(opt => opt.classList.remove('correct', 'incorrect'));
 
-    if (!selected) { allAnswered = false; card.classList.add('missing'); return; }
+    const correctText = quizData.flatMap(l => l.questions)[qIndex].options[correctIdx];
+
+    if (!selected) {
+      allAnswered = false; card.classList.add('missing');
+      details.push({ label: `Q${qIndex + 1}`, studentAnswer: '(بدون إجابة)', correctAnswer: correctText, result: 'لم تُجب' });
+      return;
+    }
     card.classList.remove('missing');
     const selectedIdx = parseInt(selected.value, 10);
     const selectedLabel = card.querySelector(`.option[data-optidx="${selectedIdx}"]`);
     const correctLabel = card.querySelector(`.option[data-optidx="${correctIdx}"]`);
-    if (selectedIdx === correctIdx) { score += 1; selectedLabel.classList.add('correct'); }
-    else { selectedLabel.classList.add('incorrect'); correctLabel.classList.add('correct'); }
+    const studentText = selectedLabel.querySelector('span').textContent;
+    if (selectedIdx === correctIdx) {
+      score += 1; selectedLabel.classList.add('correct');
+      details.push({ label: `Q${qIndex + 1}`, studentAnswer: studentText, correctAnswer: correctText, result: 'صحيح' });
+    } else {
+      selectedLabel.classList.add('incorrect'); correctLabel.classList.add('correct');
+      details.push({ label: `Q${qIndex + 1}`, studentAnswer: studentText, correctAnswer: correctText, result: 'خطأ' });
+    }
   });
 
   // Section B
@@ -575,13 +588,25 @@ document.getElementById('submitBtn').addEventListener('click', () => {
     const options = card.querySelectorAll('.option');
     options.forEach(opt => opt.classList.remove('correct', 'incorrect'));
 
-    if (!selected) { allAnswered = false; card.classList.add('missing'); return; }
+    const correctText = dialogueData[dIdx].options[correctIdx];
+
+    if (!selected) {
+      allAnswered = false; card.classList.add('missing');
+      details.push({ label: `D${dIdx + 1}`, studentAnswer: '(بدون إجابة)', correctAnswer: correctText, result: 'لم تُجب' });
+      return;
+    }
     card.classList.remove('missing');
     const selectedIdx = parseInt(selected.value, 10);
     const selectedLabel = card.querySelector(`.option[data-optidx="${selectedIdx}"]`);
     const correctLabel = card.querySelector(`.option[data-optidx="${correctIdx}"]`);
-    if (selectedIdx === correctIdx) { score += 1; selectedLabel.classList.add('correct'); }
-    else { selectedLabel.classList.add('incorrect'); correctLabel.classList.add('correct'); }
+    const studentText = selectedLabel.querySelector('span').textContent;
+    if (selectedIdx === correctIdx) {
+      score += 1; selectedLabel.classList.add('correct');
+      details.push({ label: `D${dIdx + 1}`, studentAnswer: studentText, correctAnswer: correctText, result: 'صحيح' });
+    } else {
+      selectedLabel.classList.add('incorrect'); correctLabel.classList.add('correct');
+      details.push({ label: `D${dIdx + 1}`, studentAnswer: studentText, correctAnswer: correctText, result: 'خطأ' });
+    }
   });
 
   // Section C — word-level partial credit
@@ -595,6 +620,7 @@ document.getElementById('submitBtn').addEventListener('click', () => {
       input.closest('.q-card').classList.add('missing');
       allAnswered = false;
       feedback.classList.remove('show');
+      details.push({ label: `F${fIdx + 1}`, studentAnswer: '(بدون إجابة)', correctAnswer: item.answer, result: 'لم تُجب' });
       return;
     }
     input.closest('.q-card').classList.remove('missing');
@@ -623,15 +649,24 @@ document.getElementById('submitBtn').addEventListener('click', () => {
     score += fraction;
     feedback.innerHTML = feedbackHtml + `<br><span style="color:var(--sage-dark);font-weight:700;">${matched}/${expectedWords.length} كلمات صحيحة</span>`;
     feedback.classList.add('show');
+
+    const resultLabel = matched === expectedWords.length ? 'صحيح بالكامل' : (matched === 0 ? 'خطأ بالكامل' : `صحيح جزئيًا (${matched}/${expectedWords.length} كلمات)`);
+    details.push({ label: `F${fIdx + 1}`, studentAnswer: studentVal, correctAnswer: item.answer, result: resultLabel });
   });
 
   // Section D — easy writing, completion-based (full credit if answered)
+  const writingLabels = { write1: 'W1 (My name is)', write2: 'W2 (I study)', write3: 'W3 (My goal)' };
   ['write1', 'write2', 'write3'].forEach((id) => {
     maxScore += 1;
     const val = document.getElementById(id).value.trim();
     const card = document.getElementById(id).closest('.writing-card');
-    if (val) { score += 1; }
-    else { allAnswered = false; card.classList.add('missing'); }
+    if (val) {
+      score += 1;
+      details.push({ label: writingLabels[id], studentAnswer: val, correctAnswer: '(إجابة حرة)', result: 'مكتملة' });
+    } else {
+      allAnswered = false; card.classList.add('missing');
+      details.push({ label: writingLabels[id], studentAnswer: '(بدون إجابة)', correctAnswer: '(إجابة حرة)', result: 'لم تُجب' });
+    }
   });
   if (['write1','write2','write3'].every(id => document.getElementById(id).value.trim())) {
     document.querySelector('.writing-card').classList.remove('missing');
@@ -664,6 +699,10 @@ document.getElementById('submitBtn').addEventListener('click', () => {
   resultCard.classList.add('show');
   resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+  // Flatten details into one string per question for easy spreadsheet columns:
+  // "الإجابة: ... | الصحيح: ... | النتيجة: ..."
+  const detailsFlat = details.map(d => `${d.label} — إجابتها: ${d.studentAnswer} | الصحيح: ${d.correctAnswer} | ${d.result}`);
+
   // Send to Google Sheet if URL is configured
   if (GAS_URL) {
     sentStatus.textContent = "جاري إرسال النتيجة...";
@@ -679,7 +718,8 @@ document.getElementById('submitBtn').addEventListener('click', () => {
         score: roundedScore,
         maxScore: maxScore,
         percent: percent,
-        timestamp: new Date().toLocaleString('ar-EG')
+        timestamp: new Date().toLocaleString('ar-EG'),
+        details: detailsFlat
       })
     }).then(() => {
       sentStatus.textContent = "تم إرسال النتيجة بنجاح ✅";
