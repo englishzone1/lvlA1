@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Zone — Final Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f7f5ef;
+    --card:#ffffff;
+    --sage:#8fac82;
+    --sage-dark:#5f7d57;
+    --sage-pale:#e9f0e4;
+    --gold:#e7c878;
+    --gold-pale:#faf1d9;
+    --pink:#f0d4d8;
+    --pink-dark:#b85a68;
+    --ink:#2c2c28;
+    --sub:#6b6b63;
+    --line:#e7e3d8;
+    --radius:18px;
+    --shadow:0 10px 30px rgba(60,55,40,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Tajawal','Nunito',sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3{ font-family:'Poppins','Tajawal',sans-serif; }
+  .page{ max-width:840px; margin:0 auto; padding:30px 20px 90px; }
+
+  /* ===== GATE SCREEN ===== */
+  #gateScreen{
+    min-height:80vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .gate-card{
+    background:#fff;
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:40px 32px;
+    max-width:440px;
+    width:100%;
+    text-align:center;
+  }
+  .gate-card .brand{
+    font-family:'Poppins',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    color:var(--sage-dark);
+    margin-bottom:4px;
+  }
+  .gate-card .brand span{ color:var(--gold); }
+  .gate-card .subtitle{
+    font-size:14px;
+    color:var(--sub);
+    margin-bottom:4px;
+    direction:rtl;
+  }
+  .gate-card .prepared{
+    font-size:13px;
+    color:var(--sage-dark);
+    font-weight:700;
+    margin-bottom:26px;
+    direction:rtl;
+  }
+  .gate-field{
+    text-align:right;
+    direction:rtl;
+    margin-bottom:16px;
+  }
+  .gate-field label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .gate-field input{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    font-family:'Tajawal',sans-serif;
+    font-size:15px;
+    background:var(--cream);
+  }
+  .gate-field input:focus{ outline:none; border-color:var(--sage); }
+  .gate-error{
+    color:var(--pink-dark);
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:10px;
+    display:none;
+    direction:rtl;
+  }
+  .start-btn{
+    width:100%;
+    background:var(--sage-dark);
+    color:#fff;
+    font-family:'Poppins','Tajawal',sans-serif;
+    font-weight:700;
+    font-size:16px;
+    border:none;
+    padding:14px;
+    border-radius:12px;
+    cursor:pointer;
+    margin-top:8px;
+    transition:background .15s ease;
+  }
+  .start-btn:hover{ background:#4a6544; }
+
+  /* ===== QUIZ SCREEN ===== */
+  #quizScreen{ display:none; direction:rtl; }
+  #quizScreen.show{ display:block; }
+
+  header.top{ text-align:center; margin-bottom:30px; }
+  header.top .badge{
+    display:inline-block; border:1.5px solid var(--sage); color:var(--sage-dark);
+    font-weight:700; font-size:13px; padding:6px 16px; border-radius:999px;
+    background:#fff; margin-bottom:14px;
+  }
+  header.top h1{ font-size:32px; font-weight:800; margin:0 0 8px; }
+  header.top .sub{ font-size:15px; color:var(--sub); margin-bottom:6px; }
+  header.top .prepared{ font-size:14px; color:var(--sage-dark); font-weight:700; }
+
+  .intro-card{
+    background:#fff; border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:20px 24px; margin-bottom:26px; text-align:center;
+  }
+  .intro-card p{ margin:0; font-size:14.5px; color:var(--sub); }
+  .intro-card .count{ color:var(--sage-dark); font-weight:800; }
+
+  .section-title{
+    display:flex; align-items:center; gap:10px; margin:38px 0 16px;
+  }
+  .section-title .tag{
+    background:var(--gold-pale); color:#8a6c1f; font-weight:800; font-size:13px;
+    padding:6px 14px; border-radius:999px;
+  }
+  .section-title h2{ font-size:19px; margin:0; color:var(--sage-dark); }
+  .section-hint{ font-size:13px; color:var(--sub); margin:-10px 0 16px; }
+
+  .lesson-header{ display:flex; align-items:center; gap:10px; margin:30px 0 14px; }
+  .lesson-header .num{
+    background:var(--sage); color:#fff; width:32px;height:32px; border-radius:50%;
+    display:flex;align-items:center;justify-content:center; font-weight:800; font-size:14px; flex:0 0 auto;
+  }
+  .lesson-header h3{ font-size:16.5px; margin:0; color:var(--sage-dark); }
+
+  .q-card{
+    background:#fff; border-radius:16px; box-shadow:var(--shadow);
+    padding:20px 22px; margin-bottom:16px;
+  }
+  .q-text{ font-weight:700; font-size:15.5px; margin-bottom:14px; }
+  .q-text .qnum{ color:var(--sage-dark); margin-left:6px; }
+
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option{
+    display:flex; align-items:center; gap:10px; background:var(--cream);
+    border:1.5px solid var(--line); border-radius:12px; padding:12px 16px;
+    cursor:pointer; font-size:14.5px; transition:border-color .15s ease;
+  }
+  .option:hover{ border-color:var(--sage); }
+  .option input{ accent-color:var(--sage-dark); width:18px; height:18px; flex:0 0 auto; }
+  .option.correct{ background:var(--sage-pale); border-color:var(--sage); font-weight:700; }
+  .option.incorrect{ background:var(--pink); border-color:var(--pink-dark); font-weight:700; }
+
+  .dialogue-box{
+    background:var(--sage-pale); border-radius:14px; padding:16px 18px; margin-bottom:14px;
+  }
+  .dialogue-line{ font-size:14.5px; margin-bottom:6px; }
+  .dialogue-line b{ color:var(--sage-dark); }
+  .dialogue-line.blank{ font-style:italic; color:var(--sub); }
+
+  .fill-blank-wrap{ direction:ltr; text-align:left; }
+  .fill-sentence{
+    font-size:16px; font-weight:600; margin-bottom:12px; direction:ltr; text-align:left;
+  }
+  .fill-input{
+    width:100%; padding:10px 14px; border:1.5px solid var(--line); border-radius:10px;
+    font-family:'Nunito',sans-serif; font-size:15px; direction:ltr; text-align:left;
+    background:var(--cream);
+  }
+  .fill-input:focus{ outline:none; border-color:var(--sage); }
+  .fill-feedback{
+    margin-top:10px; font-size:14px; direction:ltr; text-align:left; display:none;
+  }
+  .fill-feedback.show{ display:block; }
+  .word-ok{ color:var(--sage-dark); font-weight:700; }
+  .word-bad{ color:var(--pink-dark); font-weight:700; text-decoration:line-through; }
+  .word-expected{ color:var(--sub); }
+
+  .writing-card textarea, .writing-card input{
+    width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px;
+    font-family:'Nunito',sans-serif; font-size:15px; direction:ltr; text-align:left;
+    background:var(--cream); margin-bottom:12px;
+  }
+  .writing-card textarea:focus, .writing-card input:focus{ outline:none; border-color:var(--sage); }
+  .writing-card label{ display:block; font-size:14px; font-weight:700; margin-bottom:6px; direction:ltr; text-align:left; }
+
+  .submit-wrap{ text-align:center; margin:40px 0; }
+  .submit-btn{
+    background:var(--sage-dark); color:#fff; font-family:'Poppins','Tajawal',sans-serif;
+    font-weight:700; font-size:16px; border:none; padding:14px 40px; border-radius:999px;
+    cursor:pointer; box-shadow:var(--shadow); transition:background .15s ease;
+  }
+  .submit-btn:hover{ background:#4a6544; }
+  .submit-btn:disabled{ background:#b7b2a6; cursor:not-allowed; }
+
+  .result-card{
+    display:none; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:28px; text-align:center; margin-bottom:30px; border:2px solid var(--sage);
+  }
+  .result-card.show{ display:block; }
+  .result-card .score{ font-size:38px; font-weight:800; color:var(--sage-dark); margin:6px 0; }
+  .result-card .msg{ font-size:14.5px; color:var(--sub); }
+  .result-card .badge-icon{ font-size:42px; }
+  .result-card .sent-status{ margin-top:14px; font-size:13px; font-weight:700; }
+  .sent-ok{ color:var(--sage-dark); }
+  .sent-fail{ color:var(--pink-dark); }
+
+  .missing{ outline:2px solid var(--gold); }
+
+  footer{
+    text-align:center; font-size:13px; color:var(--sub); margin-top:40px;
+    border-top:1px solid var(--line); padding-top:18px;
+  }
+
+  @media (max-width:600px){ header.top h1{ font-size:26px; } }
+</style>
+</head>
+<body>
+
+<!-- ============ GATE SCREEN ============ -->
+<div id="gateScreen">
+  <div class="gate-card">
+    <div class="brand">English <span>Zone</span></div>
+    <div class="subtitle">الاختبار الشامل — إعداد: الأستاذة أمل الحسن</div>
+    <div class="prepared">يرجى تعبئة بياناتك قبل بدء الاختبار</div>
+
+    <div class="gate-field">
+      <label>الاسم الكامل</label>
+      <input type="text" id="gateName" placeholder="اكتبي اسمك الكامل">
+    </div>
+    <div class="gate-field">
+      <label>رقم الهاتف</label>
+      <input type="tel" id="gatePhone" placeholder="مثال: 05xxxxxxxx">
+    </div>
+    <div class="gate-field">
+      <label>العمر</label>
+      <input type="number" id="gateAge" placeholder="مثال: 22" min="1" max="99">
+    </div>
+
+    <div class="gate-error" id="gateError">يرجى تعبئة جميع الحقول قبل المتابعة.</div>
+
+    <button class="start-btn" id="startBtn">ابدئي الاختبار</button>
+  </div>
+</div>
+
+<!-- ============ QUIZ SCREEN ============ -->
+<div id="quizScreen">
+<div class="page">
+
+  <header class="top">
+    <span class="badge">English Zone</span>
+    <h1>الاختبار الشامل</h1>
+    <p class="sub">مراجعة المحاضرات الثماني — من التعارف إلى الحديث عن المستقبل المهني</p>
+    <p class="prepared">إعداد: الأستاذة أمل الحسن</p>
+  </header>
+
+  <div class="intro-card">
+    <p>هذا الاختبار يغطي المفردات، القواعد، والمحادثات من جميع المحاضرات الثماني، بالإضافة إلى سؤال كتابة بسيط. عدد الأسئلة: <span class="count">36 نقطة</span>. في أسئلة الكتابة، كل كلمة تُصحَّح بشكل مستقل — خطأ في كلمة واحدة لا يُسقط الجملة كاملة.</p>
+  </div>
+
+  <form id="quizForm"></form>
+
+  <!-- Dialogue section -->
+  <div class="section-title"><span class="tag">القسم الثاني</span><h2>اختاري الرد الأنسب في المحادثة</h2></div>
+  <p class="section-hint">اقرئي السطر السابق من المحادثة، ثم اختاري رد لينا المناسب.</p>
+  <div id="dialogueForm"></div>
+
+  <!-- Fill in the blank section -->
+  <div class="section-title"><span class="tag">القسم الثالث</span><h2>أكملي الجملة (Fill in the Blank)</h2></div>
+  <p class="section-hint">اكتبي الكلمة أو الكلمات الناقصة. كل كلمة تُصحَّح على حدة.</p>
+  <div id="fillForm"></div>
+
+  <!-- Writing section -->
+  <div class="section-title"><span class="tag">القسم الرابع</span><h2>سؤال كتابة بسيط — عن نفسك</h2></div>
+  <p class="section-hint">اكتبي كما تعلمتِ من لينا — لا توجد إجابة خاطئة هنا، فقط أكملي بأسلوبك.</p>
+  <div class="q-card writing-card">
+    <label>My name is...</label>
+    <input type="text" id="write1" placeholder="My name is...">
+    <label>I study...</label>
+    <input type="text" id="write2" placeholder="I study...">
+    <label>My goal in learning English is...</label>
+    <textarea id="write3" rows="2" placeholder="My goal in learning English is..."></textarea>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submitBtn" type="button">تصحيح الاختبار وإرسال النتيجة</button>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="badge-icon" id="resultIcon">🏆</div>
+    <div class="score" id="scoreText">0 / 36</div>
+    <div class="msg" id="scoreMsg"></div>
+    <div class="sent-status" id="sentStatus"></div>
+  </div>
+
+  <footer>English Zone | Learn • Speak • Grow — إعداد: الأستاذة أمل الحسن</footer>
+
+</div>
+</div>
+
+<script>
+/* =========================================================
+   ⚠️ IMPORTANT — paste your Google Apps Script Web App URL here
+   Leave empty ("") to disable automatic sending to Google Sheets.
+   ========================================================= */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxsr-CI1YjvWE2BPrdpMNok2tRpqAC7PVXDkiNGjVV86FnMNp1XdLPjVY0kkE5XhbMJ7g/exec";
+
+/* ---------------- GATE LOGIC ---------------- */
+let studentInfo = { name: "", phone: "", age: "" };
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  const name = document.getElementById('gateName').value.trim();
+  const phone = document.getElementById('gatePhone').value.trim();
+  const age = document.getElementById('gateAge').value.trim();
+  const errorEl = document.getElementById('gateError');
+
+  if (!name || !phone || !age) {
+    errorEl.style.display = 'block';
+    return;
+  }
+  errorEl.style.display = 'none';
+  studentInfo = { name, phone, age };
+
+  document.getElementById('gateScreen').style.display = 'none';
+  document.getElementById('quizScreen').classList.add('show');
+  window.scrollTo(0, 0);
+});
+
+/* ---------------- SECTION A: MULTIPLE CHOICE ---------------- */
+const quizData = [
+  { lesson: "المحاضرة 1: Your First Day at University", questions: [
+      { q: "What does 'classmate' mean?", options: ["A university teacher", "Someone who studies with you", "A university subject", "A future job path"], correct: 1 },
+      { q: "Choose the correct sentence:", options: ["I study in university.", "I study at university.", "I study on university.", "I study for university."], correct: 1 },
+      { q: "What does 'assignment' mean?", options: ["A task from your teacher", "A place where students study", "A person who teaches", "A future career"], correct: 0 }
+  ]},
+  { lesson: "المحاضرة 2: Small Talk & Making New Friends", questions: [
+      { q: "'To hang out' means:", options: ["To argue with someone", "To spend relaxed time with someone", "To finish a task", "To ask a question"], correct: 1 },
+      { q: "Complete: '___ you like coffee?'", options: ["Does", "Is", "Do", "Are"], correct: 2 },
+      { q: "Complete: '___ she study Graphic Design?'", options: ["Do", "Does", "Is", "Has"], correct: 1 }
+  ]},
+  { lesson: "المحاضرة 3: Understanding Your Professor", questions: [
+      { q: "'Mandatory' means:", options: ["Optional", "Required", "Cancelled", "Late"], correct: 1 },
+      { q: "Complete: 'She ___ attend the meeting.'", options: ["have to", "has to", "having to", "had to be"], correct: 1 },
+      { q: "What are 'office hours'?", options: ["The time a professor is available for questions", "The final exam date", "A type of assignment", "The class schedule"], correct: 0 }
+  ]},
+  { lesson: "المحاضرة 4: Asking Questions in Class", questions: [
+      { q: "The most polite way to ask for repetition is:", options: ["Repeat that!", "Could you repeat that, please?", "What?", "Say it again."], correct: 1 },
+      { q: "Complete: '___ you mind explaining that again?'", options: ["Do", "Would", "Are", "Have"], correct: 1 },
+      { q: "'To clarify' means:", options: ["To confuse", "To make something clearer", "To repeat quickly", "To disagree"], correct: 1 }
+  ]},
+  { lesson: "المحاضرة 5: A Problem at University", questions: [
+      { q: "'To overlap' means:", options: ["To happen at the same time as something else", "To finish early", "To cancel an event", "To postpone a task"], correct: 0 },
+      { q: "Complete: 'I ___ the email yesterday.' (negative, past)", options: ["don't see", "didn't see", "doesn't saw", "not seeing"], correct: 1 },
+      { q: "An 'exception' is:", options: ["A strict rule with no changes", "A special case different from the usual rule", "A type of exam", "A formal apology"], correct: 1 }
+  ]},
+  { lesson: "المحاضرة 6: Group Work & Discussions", questions: [
+      { q: "The politest way to disagree is:", options: ["No, that's wrong.", "I see your point, but I think...", "You're wrong about this.", "I don't like your idea."], correct: 1 },
+      { q: "A 'compromise' is:", options: ["An argument between two people", "A solution where both sides adjust a little", "A mistake in a project", "A final deadline"], correct: 1 },
+      { q: "'To brainstorm' means:", options: ["To criticize an idea", "To generate ideas freely", "To finish a project", "To divide tasks"], correct: 1 }
+  ]},
+  { lesson: "المحاضرة 7: Presentations", questions: [
+      { q: "Complete: 'First, I'm ___ introduce the topic.'", options: ["go to", "going to", "goes to", "went to"], correct: 1 },
+      { q: "'To summarize' means:", options: ["To explain every detail", "To give the main points briefly", "To ask the audience a question", "To end the presentation"], correct: 1 },
+      { q: "Which word describes feeling worried before speaking?", options: ["Confident", "Nervous", "Engaged", "Outline"], correct: 1 }
+  ]},
+  { lesson: "المحاضرة 8: Emails & Career Talk", questions: [
+      { q: "The most formal way to make a request is:", options: ["I want ask you something.", "I would like to ask you something.", "Give me information.", "I need this now."], correct: 1 },
+      { q: "An 'opportunity' is:", options: ["A problem to solve", "A chance for something good", "A type of deadline", "A formal apology"], correct: 1 },
+      { q: "A formal email usually ends with:", options: ["See ya!", "Best regards,", "Bye bye", "Talk soon"], correct: 1 }
+  ]}
+];
+
+const form = document.getElementById('quizForm');
+let globalIndex = 0;
+const answerKey = [];
+
+quizData.forEach((lessonBlock, lIdx) => {
+  const header = document.createElement('div');
+  header.className = 'lesson-header';
+  header.innerHTML = `<span class="num">${lIdx + 1}</span><h3>${lessonBlock.lesson}</h3>`;
+  form.appendChild(header);
+
+  lessonBlock.questions.forEach((item) => {
+    const qIndex = globalIndex;
+    answerKey.push(item.correct);
+
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.dataset.qindex = qIndex;
+
+    const qText = document.createElement('div');
+    qText.className = 'q-text';
+    qText.innerHTML = `<span class="qnum">Q${qIndex + 1}.</span>${item.q}`;
+    card.appendChild(qText);
+
+    const optionsWrap = document.createElement('div');
+    optionsWrap.className = 'options';
+    item.options.forEach((optText, optIdx) => {
+      const label = document.createElement('label');
+      label.className = 'option';
+      label.dataset.optidx = optIdx;
+      label.innerHTML = `<input type="radio" name="q${qIndex}" value="${optIdx}"><span>${optText}</span>`;
+      optionsWrap.appendChild(label);
+    });
+    card.appendChild(optionsWrap);
+    form.appendChild(card);
+    globalIndex++;
+  });
+});
+
+/* ---------------- SECTION B: DIALOGUE CHOICE ---------------- */
+const dialogueData = [
+  { prev: [["Sarah", "Of course, go ahead! I'm Sarah, by the way."]],
+    options: ["I don't care.", "Nice to meet you, Sarah. I'm Lina. Are you new here too?", "Goodbye.", "What?"], correct: 1 },
+  { prev: [["Dr. Hassan", "Any other questions before we continue?"]],
+    options: ["No.", "Actually, yes — could you repeat the last point? I was still writing.", "I'm bored.", "Whatever."], correct: 1 },
+  { prev: [["Ms. Farah", "That's okay. Do you have both exam times in writing?"]],
+    options: ["Yes, here they are. I was hoping I could request a reschedule for one of them.", "No, I don't care about that.", "Maybe later.", "I don't have time for this."], correct: 0 },
+  { prev: [["Omar", "A survey? That could take too much time, honestly."]],
+    options: ["You're wrong.", "What if we combined both ideas — a short survey first, then ads based on the results?", "I don't want to work with you.", "Whatever you say."], correct: 1 }
+];
+
+const dialogueForm = document.getElementById('dialogueForm');
+const dialogueAnswerKey = [];
+
+dialogueData.forEach((item, dIdx) => {
+  dialogueAnswerKey.push(item.correct);
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.dataset.dindex = dIdx;
+
+  const box = document.createElement('div');
+  box.className = 'dialogue-box';
+  item.prev.forEach(([speaker, line]) => {
+    const p = document.createElement('div');
+    p.className = 'dialogue-line';
+    p.innerHTML = `<b>${speaker}:</b> "${line}"`;
+    box.appendChild(p);
+  });
+  const blankLine = document.createElement('div');
+  blankLine.className = 'dialogue-line blank';
+  blankLine.textContent = 'Lina: ___________';
+  box.appendChild(blankLine);
+  card.appendChild(box);
+
+  const qText = document.createElement('div');
+  qText.className = 'q-text';
+  qText.innerHTML = `<span class="qnum">D${dIdx + 1}.</span> Choose Lina's best reply:`;
+  card.appendChild(qText);
+
+  const optionsWrap = document.createElement('div');
+  optionsWrap.className = 'options';
+  item.options.forEach((optText, optIdx) => {
+    const label = document.createElement('label');
+    label.className = 'option';
+    label.dataset.optidx = optIdx;
+    label.innerHTML = `<input type="radio" name="d${dIdx}" value="${optIdx}"><span>${optText}</span>`;
+    optionsWrap.appendChild(label);
+  });
+  card.appendChild(optionsWrap);
+  dialogueForm.appendChild(card);
+});
+
+/* ---------------- SECTION C: FILL IN THE BLANK (word-level partial credit) ---------------- */
+const fillData = [
+  { sentence: "Could you ______ that again, please?", answer: "repeat" },
+  { sentence: "She ______ submit the report by Friday.", answer: "has to" },
+  { sentence: "I ______ the email yesterday. (negative, past of 'see')", answer: "didn't see" },
+  { sentence: "First, I'm ______ introduce the topic.", answer: "going to" },
+  { sentence: "I would ______ to ask about my grade.", answer: "like" }
+];
+
+const fillForm = document.getElementById('fillForm');
+
+fillData.forEach((item, fIdx) => {
+  const card = document.createElement('div');
+  card.className = 'q-card fill-blank-wrap';
+  card.dataset.findex = fIdx;
+
+  const sentence = document.createElement('div');
+  sentence.className = 'fill-sentence';
+  sentence.innerHTML = `<span class="qnum" style="direction:rtl;display:inline-block;margin-left:6px;">F${fIdx + 1}.</span>${item.sentence}`;
+  card.appendChild(sentence);
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'fill-input';
+  input.placeholder = 'اكتبي إجابتك هنا...';
+  input.id = `fill${fIdx}`;
+  card.appendChild(input);
+
+  const feedback = document.createElement('div');
+  feedback.className = 'fill-feedback';
+  feedback.id = `fillFeedback${fIdx}`;
+  card.appendChild(feedback);
+
+  fillForm.appendChild(card);
+});
+
+/* Levenshtein distance for single-letter-typo tolerance */
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m + 1}, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (a[i-1] === b[j-1]) dp[i][j] = dp[i-1][j-1];
+      else dp[i][j] = 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+
+function wordsMatch(studentWord, expectedWord) {
+  const s = studentWord.toLowerCase().trim();
+  const e = expectedWord.toLowerCase().trim();
+  if (s === e) return true;
+  // allow 1-letter typo tolerance for words longer than 3 letters
+  if (e.length > 3 && levenshtein(s, e) <= 1) return true;
+  return false;
+}
+
+/* ---------------- SCORING ---------------- */
+document.getElementById('submitBtn').addEventListener('click', () => {
+  let score = 0;
+  let maxScore = 0;
+  let allAnswered = true;
+
+  // Section A
+  answerKey.forEach((correctIdx, qIndex) => {
+    maxScore += 1;
+    const card = document.querySelector(`.q-card[data-qindex="${qIndex}"]`);
+    const selected = card.querySelector(`input[name="q${qIndex}"]:checked`);
+    const options = card.querySelectorAll('.option');
+    options.forEach(opt => opt.classList.remove('correct', 'incorrect'));
+
+    if (!selected) { allAnswered = false; card.classList.add('missing'); return; }
+    card.classList.remove('missing');
+    const selectedIdx = parseInt(selected.value, 10);
+    const selectedLabel = card.querySelector(`.option[data-optidx="${selectedIdx}"]`);
+    const correctLabel = card.querySelector(`.option[data-optidx="${correctIdx}"]`);
+    if (selectedIdx === correctIdx) { score += 1; selectedLabel.classList.add('correct'); }
+    else { selectedLabel.classList.add('incorrect'); correctLabel.classList.add('correct'); }
+  });
+
+  // Section B
+  dialogueAnswerKey.forEach((correctIdx, dIdx) => {
+    maxScore += 1;
+    const card = document.querySelector(`.q-card[data-dindex="${dIdx}"]`);
+    const selected = card.querySelector(`input[name="d${dIdx}"]:checked`);
+    const options = card.querySelectorAll('.option');
+    options.forEach(opt => opt.classList.remove('correct', 'incorrect'));
+
+    if (!selected) { allAnswered = false; card.classList.add('missing'); return; }
+    card.classList.remove('missing');
+    const selectedIdx = parseInt(selected.value, 10);
+    const selectedLabel = card.querySelector(`.option[data-optidx="${selectedIdx}"]`);
+    const correctLabel = card.querySelector(`.option[data-optidx="${correctIdx}"]`);
+    if (selectedIdx === correctIdx) { score += 1; selectedLabel.classList.add('correct'); }
+    else { selectedLabel.classList.add('incorrect'); correctLabel.classList.add('correct'); }
+  });
+
+  // Section C — word-level partial credit
+  fillData.forEach((item, fIdx) => {
+    maxScore += 1;
+    const input = document.getElementById(`fill${fIdx}`);
+    const feedback = document.getElementById(`fillFeedback${fIdx}`);
+    const studentVal = input.value.trim();
+
+    if (!studentVal) {
+      input.closest('.q-card').classList.add('missing');
+      allAnswered = false;
+      feedback.classList.remove('show');
+      return;
+    }
+    input.closest('.q-card').classList.remove('missing');
+
+    const expectedWords = item.answer.split(/\s+/);
+    const studentWords = studentVal.split(/\s+/);
+    let matched = 0;
+    let feedbackHtml = '';
+
+    const maxLen = Math.max(expectedWords.length, studentWords.length);
+    for (let i = 0; i < maxLen; i++) {
+      const sw = studentWords[i] || '';
+      const ew = expectedWords[i] || '';
+      if (ew && sw && wordsMatch(sw, ew)) {
+        matched++;
+        feedbackHtml += `<span class="word-ok">${sw}</span> `;
+      } else if (sw) {
+        feedbackHtml += `<span class="word-bad">${sw}</span> `;
+        if (ew) feedbackHtml += `<span class="word-expected">(expected: ${ew})</span> `;
+      } else if (ew) {
+        feedbackHtml += `<span class="word-expected">(missing: ${ew})</span> `;
+      }
+    }
+
+    const fraction = matched / expectedWords.length;
+    score += fraction;
+    feedback.innerHTML = feedbackHtml + `<br><span style="color:var(--sage-dark);font-weight:700;">${matched}/${expectedWords.length} كلمات صحيحة</span>`;
+    feedback.classList.add('show');
+  });
+
+  // Section D — easy writing, completion-based (full credit if answered)
+  ['write1', 'write2', 'write3'].forEach((id) => {
+    maxScore += 1;
+    const val = document.getElementById(id).value.trim();
+    const card = document.getElementById(id).closest('.writing-card');
+    if (val) { score += 1; }
+    else { allAnswered = false; card.classList.add('missing'); }
+  });
+  if (['write1','write2','write3'].every(id => document.getElementById(id).value.trim())) {
+    document.querySelector('.writing-card').classList.remove('missing');
+  }
+
+  const resultCard = document.getElementById('resultCard');
+  const scoreText = document.getElementById('scoreText');
+  const scoreMsg = document.getElementById('scoreMsg');
+  const resultIcon = document.getElementById('resultIcon');
+  const sentStatus = document.getElementById('sentStatus');
+
+  const roundedScore = Math.round(score * 10) / 10;
+  const percent = Math.round((score / maxScore) * 100);
+  scoreText.textContent = `${roundedScore} / ${maxScore}`;
+
+  if (!allAnswered) {
+    scoreMsg.textContent = "لم تُجيبي على جميع الأسئلة بعد — الأسئلة المتبقية محاطة بإطار ذهبي.";
+    resultIcon.textContent = "✏️";
+  } else if (percent === 100) {
+    scoreMsg.textContent = "ممتازة! إجابات كاملة وصحيحة — أنتِ جاهزة تمامًا.";
+    resultIcon.textContent = "🏆";
+  } else if (percent >= 70) {
+    scoreMsg.textContent = "أداء جيد جدًا! راجعي الإجابات الخاطئة قليلاً وستتقنين المحتوى بالكامل.";
+    resultIcon.textContent = "🌟";
+  } else {
+    scoreMsg.textContent = "لا بأس، هذا جزء من التعلم! راجعي المحاضرات المتعلقة بالأسئلة الخاطئة وحاولي مجددًا.";
+    resultIcon.textContent = "📘";
+  }
+
+  resultCard.classList.add('show');
+  resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Send to Google Sheet if URL is configured
+  if (GAS_URL) {
+    sentStatus.textContent = "جاري إرسال النتيجة...";
+    sentStatus.className = 'sent-status';
+    fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        name: studentInfo.name,
+        phone: studentInfo.phone,
+        age: studentInfo.age,
+        score: roundedScore,
+        maxScore: maxScore,
+        percent: percent,
+        timestamp: new Date().toLocaleString('ar-EG')
+      })
+    }).then(() => {
+      sentStatus.textContent = "تم إرسال النتيجة بنجاح ✅";
+      sentStatus.className = 'sent-status sent-ok';
+    }).catch(() => {
+      sentStatus.textContent = "تعذر إرسال النتيجة — تحقق من الاتصال بالإنترنت.";
+      sentStatus.className = 'sent-status sent-fail';
+    });
+  } else {
+    sentStatus.textContent = "";
+  }
+});
+</script>
+</body>
+</html>
